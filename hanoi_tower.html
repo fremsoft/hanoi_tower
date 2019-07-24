@@ -9,7 +9,7 @@
 <script>
 /* Questo algoritmo non è appositamente ottimizzato a scopo didattico */
 /* impostare in questa variabile globale il numero di piattelli */
-var numero_di_piattelli = 4;
+var numero_di_piattelli = 5;
 
 /* DICHIARAZIONE DELLE VARIABILI GLOBALI */
 
@@ -17,11 +17,6 @@ var numero_di_piattelli = 4;
 var a = []; 
 var b = [];
 var c = [];
-
-/* contatori, rappresentano il numero di piattelli in ognuna delle tre aste */
-var numero_piattelli_in_a = 0;
-var numero_piattelli_in_b = 0;
-var numero_piattelli_in_c = 0;
 
 var numero_totale_di_mosse = 0;
 
@@ -34,13 +29,10 @@ function inizializzazione()
   di numeri nell'array corrispondente 
   alla prima asticella A */
   
-  var i, diametro;
-  for (i=0, diametro=numero_di_piattelli; i<numero_di_piattelli; i++)
+  var diametro;
+  for (diametro=numero_di_piattelli; diametro > 0; diametro --)
   {
-    a[i] = diametro; /*  mentre incrementa l'indice  */
-    diametro --;     /*  diminuisce il diametro del piattello */
-    
-    numero_piattelli_in_a ++;
+    a.push(diametro); /*  mentre incrementa l'indice diminuisce il diametro del piattello */
   }
 }
 
@@ -52,11 +44,20 @@ function situazione_aste()
   
   var retval = "", next;
   
-  retval = "<p><b>A</b> = "; next = ""; if (numero_piattelli_in_a==0) { retval = retval + "vuoto"; } else for (i=0; i<numero_piattelli_in_a; i++) { retval = retval + next + a[i]; next = ", "; } retval = retval + "; "
+  retval = "<p><b>A</b> = "; next = ""; 
+  if (a.length==0) { retval = retval + "vuoto"; } 
+  else for (i=0; i<a.length; i++) { retval = retval + next + a[i]; next = ", "; }
+  retval = retval + "; "
 
-  retval = retval + "<b>B</b> = "; next = ""; if (numero_piattelli_in_b==0) { retval = retval + "vuoto"; } else for (i=0; i<numero_piattelli_in_b; i++) { retval = retval + next + b[i]; next = ", "; } retval = retval + "; "
+  retval = retval + "<b>B</b> = "; next = ""; 
+  if (b.length==0) { retval = retval + "vuoto"; } 
+  else for (i=0; i<b.length; i++) { retval = retval + next + b[i]; next = ", "; } 
+  retval = retval + "; "
 
-  retval = retval + "<b>C</b> = "; next = ""; if (numero_piattelli_in_c==0) { retval = retval + "vuoto"; } else for (i=0; i<numero_piattelli_in_c; i++) { retval = retval + next + c[i]; next = ", "; } retval = retval + "</p>"
+  retval = retval + "<b>C</b> = "; next = ""; 
+  if (c.length==0) { retval = retval + "vuoto"; } 
+  else for (i=0; i<c.length; i++) { retval = retval + next + c[i]; next = ", "; } 
+  retval = retval + "</p>"
   
   return retval;
 }
@@ -67,9 +68,9 @@ function sposta(src, index_src, dst)
   che si occupa di spostare i piattelli */
   var val_src, len_src, len_dst, alt_dst, index_dst;
   
-  if (src == 'a') { len_src = numero_piattelli_in_a - index_src; val_src = a[index_src]; }
-  if (src == 'b') { len_src = numero_piattelli_in_b - index_src; val_src = b[index_src]; }
-  if (src == 'c') { len_src = numero_piattelli_in_c - index_src; val_src = c[index_src]; }
+  if (src == 'A') { len_src = a.length - index_src; val_src = a[index_src]; }
+  if (src == 'B') { len_src = b.length - index_src; val_src = b[index_src]; }
+  if (src == 'C') { len_src = c.length - index_src; val_src = c[index_src]; }
   
   if (len_src == 1)
   { 
@@ -77,20 +78,16 @@ function sposta(src, index_src, dst)
     composta da un solo disco, semplicemente
     lo sposta */
     
-    if (dst == 'a') { index_dst = numero_piattelli_in_a; a[index_dst] = val_src; }
-    if (dst == 'b') { index_dst = numero_piattelli_in_b; b[index_dst] = val_src; }
-    if (dst == 'c') { index_dst = numero_piattelli_in_c; c[index_dst] = val_src; }
+    if (dst == 'A') { a.push(val_src); }
+    if (dst == 'B') { b.push(val_src); }
+    if (dst == 'C') { c.push(val_src); }
     
-    if (src == 'a') { a[index_src] = 0; numero_piattelli_in_a --; }
-    if (src == 'b') { b[index_src] = 0; numero_piattelli_in_b --; }
-    if (src == 'c') { c[index_src] = 0; numero_piattelli_in_c --; }
-    
-    if (dst == 'a') { numero_piattelli_in_a ++; }
-    if (dst == 'b') { numero_piattelli_in_b ++; }
-    if (dst == 'c') { numero_piattelli_in_c ++; }
+    if (src == 'A') { a.pop(); }
+    if (src == 'B') { b.pop(); }
+    if (src == 'C') { c.pop(); }
     
     numero_totale_di_mosse ++;
-    output_html = output_html + "<p>*** mossa numero " + numero_totale_di_mosse + " </p>"
+    output_html = output_html + "<p>*** Mossa numero <b>" + numero_totale_di_mosse + "</b> da <b>" + src + "</b> a <b>" + dst+ "</b></p>"
     output_html = output_html + situazione_aste();
   }
   else
@@ -105,13 +102,13 @@ function sposta(src, index_src, dst)
     posizione temporanea di appoggio all'asta 
     di destinazione */
     
-    if (src == 'a') { if (dst == 'b') { alt_dst = 'c'; } else { alt_dst = 'b'; } }
-    if (src == 'b') { if (dst == 'a') { alt_dst = 'c'; } else { alt_dst = 'a'; } }
-    if (src == 'c') { if (dst == 'a') { alt_dst = 'b'; } else { alt_dst = 'a'; } }
+    if (src == 'A') { if (dst == 'B') { alt_dst = 'C'; } else { alt_dst = 'B'; } }
+    if (src == 'B') { if (dst == 'A') { alt_dst = 'C'; } else { alt_dst = 'A'; } }
+    if (src == 'C') { if (dst == 'A') { alt_dst = 'B'; } else { alt_dst = 'A'; } }
     
-    if (alt_dst == 'a') { index_dst = numero_piattelli_in_a; }
-    if (alt_dst == 'b') { index_dst = numero_piattelli_in_b; }
-    if (alt_dst == 'c') { index_dst = numero_piattelli_in_c; }
+    if (alt_dst == 'A') { index_dst = a.length; }
+    if (alt_dst == 'B') { index_dst = b.length; }
+    if (alt_dst == 'C') { index_dst = c.length; }
     
     sposta(src, index_src+1, alt_dst);
     sposta(src, index_src, dst);
@@ -125,7 +122,7 @@ inizializzazione();
 
 output_html = situazione_aste();
 
-sposta('a', 0, 'c'); 
+sposta('A', 0, 'C'); 
 
 output_html = output_html + '<h2>Gioco risolto in <span style="color:green;">' + numero_totale_di_mosse + '</span> mosse</p>';
     
