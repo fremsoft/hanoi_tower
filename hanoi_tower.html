@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html>
+<body>
+
+<h2>Soluzione di una torre di Hanoi da <span id="numero" style="color:green;">0</span> piattelli</h2>
+
+<div id="soluzione"></div>
+
+<script>
+/* Questo algoritmo non è appositamente ottimizzato a scopo didattico */
+/* impostare in questa variabile globale il numero di piattelli */
+var numero_di_piattelli = 4;
+
+/* DICHIARAZIONE DELLE VARIABILI GLOBALI */
+
+/* array che rappresentano le aste con i piattelli impilati */
+var a = []; 
+var b = [];
+var c = [];
+
+/* contatori, rappresentano il numero di piattelli in ognuna delle tre aste */
+var numero_piattelli_in_a = 0;
+var numero_piattelli_in_b = 0;
+var numero_piattelli_in_c = 0;
+
+var numero_totale_di_mosse = 0;
+
+/* stringa html per output a schermo */
+var output_html;
+
+function inizializzazione()
+{
+  /* L'inizializzazione, crea una serie 
+  di numeri nell'array corrispondente 
+  alla prima asticella A */
+  
+  var i, diametro;
+  for (i=0, diametro=numero_di_piattelli; i<numero_di_piattelli; i++)
+  {
+    a[i] = diametro; /*  mentre incrementa l'indice  */
+    diametro --;     /*  diminuisce il diametro del piattello */
+    
+    numero_piattelli_in_a ++;
+  }
+}
+
+function situazione_aste()
+{	
+  /* Questa funzione crea una riga di 
+  ipertesto HTML per mostrare la 
+  situazione attuale della torre di Hanoi */
+  
+  var retval = "", next;
+  
+  retval = "<p><b>A</b> = "; next = ""; if (numero_piattelli_in_a==0) { retval = retval + "vuoto"; } else for (i=0; i<numero_piattelli_in_a; i++) { retval = retval + next + a[i]; next = ", "; } retval = retval + "; "
+
+  retval = retval + "<b>B</b> = "; next = ""; if (numero_piattelli_in_b==0) { retval = retval + "vuoto"; } else for (i=0; i<numero_piattelli_in_b; i++) { retval = retval + next + b[i]; next = ", "; } retval = retval + "; "
+
+  retval = retval + "<b>C</b> = "; next = ""; if (numero_piattelli_in_c==0) { retval = retval + "vuoto"; } else for (i=0; i<numero_piattelli_in_c; i++) { retval = retval + next + c[i]; next = ", "; } retval = retval + "</p>"
+  
+  return retval;
+}
+
+function sposta(src, index_src, dst)
+{
+  /* Questa e' la funzione ricorsiva 
+  che si occupa di spostare i piattelli */
+  var val_src, len_src, len_dst, alt_dst, index_dst;
+  
+  if (src == 'a') { len_src = numero_piattelli_in_a - index_src; val_src = a[index_src]; }
+  if (src == 'b') { len_src = numero_piattelli_in_b - index_src; val_src = b[index_src]; }
+  if (src == 'c') { len_src = numero_piattelli_in_c - index_src; val_src = c[index_src]; }
+  
+  if (len_src == 1)
+  { 
+    /* se la torre (o torre parziale) e' 
+    composta da un solo disco, semplicemente
+    lo sposta */
+    
+    if (dst == 'a') { index_dst = numero_piattelli_in_a; a[index_dst] = val_src; }
+    if (dst == 'b') { index_dst = numero_piattelli_in_b; b[index_dst] = val_src; }
+    if (dst == 'c') { index_dst = numero_piattelli_in_c; c[index_dst] = val_src; }
+    
+    if (src == 'a') { a[index_src] = 0; numero_piattelli_in_a --; }
+    if (src == 'b') { b[index_src] = 0; numero_piattelli_in_b --; }
+    if (src == 'c') { c[index_src] = 0; numero_piattelli_in_c --; }
+    
+    if (dst == 'a') { numero_piattelli_in_a ++; }
+    if (dst == 'b') { numero_piattelli_in_b ++; }
+    if (dst == 'c') { numero_piattelli_in_c ++; }
+    
+    numero_totale_di_mosse ++;
+    output_html = output_html + "<p>*** mossa numero " + numero_totale_di_mosse + " </p>"
+    output_html = output_html + situazione_aste();
+  }
+  else
+  {
+    /* altrimenti libera l'ultimo dischetto
+    in basso seguendo i tre passaggi:
+    1) spostando la torre (T-1) che lo sovrasta 
+    nella asticella di appoggio temporaneo
+    2) spostando il dischetto piu' in basso nella
+    asta di destinazione 
+    3) spostando nuovamente la torre (T-1) dalla
+    posizione temporanea di appoggio all'asta 
+    di destinazione */
+    
+    if (src == 'a') { if (dst == 'b') { alt_dst = 'c'; } else { alt_dst = 'b'; } }
+    if (src == 'b') { if (dst == 'a') { alt_dst = 'c'; } else { alt_dst = 'a'; } }
+    if (src == 'c') { if (dst == 'a') { alt_dst = 'b'; } else { alt_dst = 'a'; } }
+    
+    if (alt_dst == 'a') { index_dst = numero_piattelli_in_a; }
+    if (alt_dst == 'b') { index_dst = numero_piattelli_in_b; }
+    if (alt_dst == 'c') { index_dst = numero_piattelli_in_c; }
+    
+    sposta(src, index_src+1, alt_dst);
+    sposta(src, index_src, dst);
+    sposta(alt_dst, index_dst, dst);
+  }
+}
+
+/* INIZIO PROGRAMMA */ 
+
+inizializzazione(); 
+
+output_html = situazione_aste();
+
+sposta('a', 0, 'c'); 
+
+output_html = output_html + '<h2>Gioco risolto in <span style="color:green;">' + numero_totale_di_mosse + '</span> mosse</p>';
+    
+/* RENDERING OUTPUT SU ELEMENTO HTML */
+document.getElementById("numero").innerHTML = numero_di_piattelli;
+document.getElementById("soluzione").innerHTML = output_html;
+
+</script>
+</body>
+</html>
